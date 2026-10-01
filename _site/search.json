@@ -1,0 +1,121 @@
+[
+  {
+    "objectID": "analysis1.html#load-the-data",
+    "href": "analysis1.html#load-the-data",
+    "title": "Palm Trees",
+    "section": "Load the data",
+    "text": "Load the data\n\npalmtrees &lt;- readr::read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-03-18/palmtrees.csv\"\n)"
+  },
+  {
+    "objectID": "Untitled-1.html",
+    "href": "Untitled-1.html",
+    "title": "Home",
+    "section": "",
+    "text": "Hi, my name is Tyler Rhee. I am a student learning data science and R programming.\nThis website showcases some of my data visualization projects using data from TidyTuesday.\n\n\nExplore the Data Viz menu to see my two data analysis projects.\n\n\n\nYou can find the code for this website in my GitHub repository."
+  },
+  {
+    "objectID": "Untitled-1.html#my-projects",
+    "href": "Untitled-1.html#my-projects",
+    "title": "Home",
+    "section": "",
+    "text": "Explore the Data Viz menu to see my two data analysis projects."
+  },
+  {
+    "objectID": "Untitled-1.html#my-code",
+    "href": "Untitled-1.html#my-code",
+    "title": "Home",
+    "section": "",
+    "text": "You can find the code for this website in my GitHub repository."
+  },
+  {
+    "objectID": "AboutMe.html",
+    "href": "AboutMe.html",
+    "title": "about",
+    "section": "",
+    "text": "Hi, my name is Tyler Rhee. I am a student learning data science and R programming.\nThis website showcases some of my data visualization projects using data from TidyTuesday.\n\n\nExplore the Data Viz menu to see my two data analysis projects.\n\n\n\nYou can find the code for this website in my GitHub repository."
+  },
+  {
+    "objectID": "AboutMe.html#my-projects",
+    "href": "AboutMe.html#my-projects",
+    "title": "about",
+    "section": "",
+    "text": "Explore the Data Viz menu to see my two data analysis projects."
+  },
+  {
+    "objectID": "AboutMe.html#my-code",
+    "href": "AboutMe.html#my-code",
+    "title": "about",
+    "section": "",
+    "text": "You can find the code for this website in my GitHub repository."
+  },
+  {
+    "objectID": "analysis2.html",
+    "href": "analysis2.html",
+    "title": "Palmer Penguins",
+    "section": "",
+    "text": "This project explores data about penguins. I will compare the flipper lengths of different penguin species using a visualization.\n\n\n\npenguins &lt;- readr::read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2020/2020-07-28/penguins.csv\"\n)\n\n\n\n\nThis boxplot compares the flipper lengths of Adelie, Chinstrap, and Gentoo penguins.\n\nggplot2::ggplot(\n  penguins,\n  ggplot2::aes(x = species, y = flipper_length_mm)\n) +\n  ggplot2::geom_boxplot() +\n  ggplot2::labs(\n    title = \"Flipper Length by Penguin Species\",\n    x = \"Penguin Species\",\n    y = \"Flipper Length (mm)\"\n  )\n\n\n\n\n\n\n\n\n\n\n\n\nTidyTuesday dataset and README\nOriginal Palmer Penguins project"
+  },
+  {
+    "objectID": "analysis2.html#load-the-data",
+    "href": "analysis2.html#load-the-data",
+    "title": "Palmer Penguins",
+    "section": "",
+    "text": "penguins &lt;- readr::read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2020/2020-07-28/penguins.csv\"\n)"
+  },
+  {
+    "objectID": "analysis2.html#visualize-the-data",
+    "href": "analysis2.html#visualize-the-data",
+    "title": "Palmer Penguins",
+    "section": "",
+    "text": "This boxplot compares the flipper lengths of Adelie, Chinstrap, and Gentoo penguins.\n\nggplot2::ggplot(\n  penguins,\n  ggplot2::aes(x = species, y = flipper_length_mm)\n) +\n  ggplot2::geom_boxplot() +\n  ggplot2::labs(\n    title = \"Flipper Length by Penguin Species\",\n    x = \"Penguin Species\",\n    y = \"Flipper Length (mm)\"\n  )"
+  },
+  {
+    "objectID": "analysis2.html#sources",
+    "href": "analysis2.html#sources",
+    "title": "Palmer Penguins",
+    "section": "",
+    "text": "TidyTuesday dataset and README\nOriginal Palmer Penguins project"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "about",
+    "section": "",
+    "text": "Hi, my name is Tyler Rhee. I am a student learning data science and R programming.\nThis website showcases some of my data visualization projects using data from TidyTuesday.\n\n\nExplore the Data Viz menu to see my two data analysis projects.\n\n\n\nYou can find the code for this website in my GitHub repository.\n\n\n\nPalm trees"
+  },
+  {
+    "objectID": "about.html#my-projects",
+    "href": "about.html#my-projects",
+    "title": "about",
+    "section": "",
+    "text": "Explore the Data Viz menu to see my two data analysis projects."
+  },
+  {
+    "objectID": "about.html#my-code",
+    "href": "about.html#my-code",
+    "title": "about",
+    "section": "",
+    "text": "You can find the code for this website in my GitHub repository.\n\n\n\nPalm trees"
+  },
+  {
+    "objectID": "analysis1.html#check-the-data",
+    "href": "analysis1.html#check-the-data",
+    "title": "Palm Trees",
+    "section": "Check the data",
+    "text": "Check the data\n\nnames(palmtrees)\n\n [1] \"spec_name\"               \"acc_genus\"              \n [3] \"acc_species\"             \"palm_tribe\"             \n [5] \"palm_subfamily\"          \"climbing\"               \n [7] \"acaulescent\"             \"erect\"                  \n [9] \"stem_solitary\"           \"stem_armed\"             \n[11] \"leaves_armed\"            \"max_stem_height_m\"      \n[13] \"max_stem_dia_cm\"         \"understorey_canopy\"     \n[15] \"max_leaf_number\"         \"max__blade__length_m\"   \n[17] \"max__rachis__length_m\"   \"max__petiole_length_m\"  \n[19] \"average_fruit_length_cm\" \"min_fruit_length_cm\"    \n[21] \"max_fruit_length_cm\"     \"average_fruit_width_cm\" \n[23] \"min_fruit_width_cm\"      \"max_fruit_width_cm\"     \n[25] \"fruit_size_categorical\"  \"fruit_shape\"            \n[27] \"fruit_color_description\" \"main_fruit_colors\"      \n[29] \"conspicuousness\""
+  },
+  {
+    "objectID": "analysis1.html#visualize-the-data",
+    "href": "analysis1.html#visualize-the-data",
+    "title": "Palm Trees",
+    "section": "Visualize the data",
+    "text": "Visualize the data\nThis graph shows the 10 most common palm tree genera in the dataset.\n\ntop_genera &lt;- palmtrees |&gt;\n  dplyr::filter(!is.na(acc_genus)) |&gt;\n  dplyr::count(acc_genus, sort = TRUE) |&gt;\n  dplyr::slice_head(n = 10)\n\nggplot2::ggplot(\n  top_genera,\n  ggplot2::aes(x = reorder(acc_genus, n), y = n)\n) +\n  ggplot2::geom_col() +\n  ggplot2::coord_flip() +\n  ggplot2::labs(\n    title = \"10 Most Common Palm Tree Genera\",\n    x = \"Genus\",\n    y = \"Number of Records\"\n  )"
+  },
+  {
+    "objectID": "analysis1.html#sources",
+    "href": "analysis1.html#sources",
+    "title": "Palm Trees",
+    "section": "Sources",
+    "text": "Sources\n\nTidyTuesday Palm Trees dataset and README\nTidyTuesday project"
+  }
+]

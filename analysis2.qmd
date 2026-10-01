@@ -1,0 +1,43 @@
+
+---
+title: "Palmer Penguins"
+author: "Tyler Rhee"
+format: html
+execute:
+  warning: false
+  message: false
+---
+
+# Introduction
+
+This project explores data about penguins. I will compare the flipper lengths of different penguin species using a visualization.
+
+## Load the data
+
+```{r}
+penguins <- readr::read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2020/2020-07-28/penguins.csv"
+)
+```
+
+## Visualize the data
+
+This boxplot compares the flipper lengths of Adelie, Chinstrap, and Gentoo penguins.
+
+```{r}
+ggplot2::ggplot(
+  penguins,
+  ggplot2::aes(x = species, y = flipper_length_mm)
+) +
+  ggplot2::geom_boxplot() +
+  ggplot2::labs(
+    title = "Flipper Length by Penguin Species",
+    x = "Penguin Species",
+    y = "Flipper Length (mm)"
+  )
+```
+
+## Sources
+
+- [TidyTuesday dataset and README](https://github.com/rfordatascience/tidytuesday/tree/main/data/2020/2020-07-28)
+- [Original Palmer Penguins project](https://allisonhorst.github.io/palmerpenguins/)

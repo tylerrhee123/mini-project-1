@@ -1,0 +1,64 @@
+---
+
+---
+title: "Palm Trees"
+description: "An exploration of palm tree data"
+author: "Tyler Rhee"
+format: html
+execute:
+  warning: false
+  message: false
+---
+
+# Introduction
+
+This project that I'm doing explores a dataset about palm trees which I will exmaine the data and then create a visualization to interpret the patterns in different palm tree data.
+
+
+## Load the data
+
+```{r}
+palmtrees <- readr::read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-03-18/palmtrees.csv"
+)
+
+```
+---
+
+
+## Check the data
+
+```{r}
+names(palmtrees)
+```
+
+
+## Visualize the data
+
+This graph shows the 10 most common palm tree genera in the dataset.
+
+
+
+```{r}
+top_genera <- palmtrees |>
+  dplyr::filter(!is.na(acc_genus)) |>
+  dplyr::count(acc_genus, sort = TRUE) |>
+  dplyr::slice_head(n = 10)
+
+ggplot2::ggplot(
+  top_genera,
+  ggplot2::aes(x = reorder(acc_genus, n), y = n)
+) +
+  ggplot2::geom_col() +
+  ggplot2::coord_flip() +
+  ggplot2::labs(
+    title = "10 Most Common Palm Tree Genera",
+    x = "Genus",
+    y = "Number of Records"
+  )
+```
+
+## Sources
+
+- [TidyTuesday Palm Trees dataset and README](https://github.com/rfordatascience/tidytuesday/tree/main/data/2025/2025-03-18)
+- [TidyTuesday project](https://github.com/rfordatascience/tidytuesday)

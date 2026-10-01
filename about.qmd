@@ -1,0 +1,21 @@
+---
+title: "about"
+format: html
+---
+
+# About Me
+
+Hi, my name is Tyler Rhee. I am a student learning data science and R programming.
+
+This website showcases some of my data visualization projects using data from TidyTuesday.
+
+## My Projects
+
+Explore the **Data Viz** menu to see my two data analysis projects.
+
+
+## My Code
+
+You can find the code for this website in my [GitHub repository](https://github.com/tylerrhee123/mini-project-1).
+
+![Palm trees](images/palm-tree.jpg)
