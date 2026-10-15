@@ -11,10 +11,12 @@ website:
         href: about.qmd
       - text: "Data Viz"
         menu:
-          - text: "Analysis 1"
+          - text: "Palm Tree Diversity"
             href: analysis1.qmd
-          - text: "Analysis 2"
+          - text: "Penguin Flipper Lengths"
             href: analysis2.qmd
+          - text: "Netflix Text Analysis"
+            href: netflix-text-analysis.qmd
 
 format:
   html:

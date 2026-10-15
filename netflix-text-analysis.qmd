@@ -1,0 +1,216 @@
+
+---
+title: "Beyond the Screen: A Text Analysis of Netflix Descriptions"
+author: "Tyler Rhee"
+format:
+  html:
+    toc: true
+    code-fold: true
+    code-summary: "Show R Code"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Introduction
+
+Netflix offers a variety of movies and tv shows, each describes using a short summary intented to introduce viewers to the content. These description provide an opportunity to examine how language is used to communiate different genres.
+
+In this project, I will analyze the text of Neflix descriptions to explore three questions:
+
+1. What words and themes appear more frequently in netflix descriptions?
+2. How do descriptions differ movies and tv shows?
+3. What kinds of storytelling themes appear most often?
+
+Using string function, expressions, and data visualizations in R, I will investigate the patterns in how Netflix content is described. 
+
+
+
+## Data
+
+For this project, I use the Netflix Titles dataset from the TidyTuesday collection for April 20, 2021. The dataset contains information about 7,787 movies and TV shows, including their titles, release years, genres, and descriptions. I focus on the descriptions to identify patterns in the language used to introduce different types of content.
+
+
+```{r}
+# Load packages
+library(tidyverse)
+
+# Load Netflix dataset
+netflix <- read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-04-20/netflix_titles.csv"
+)
+
+# Examine the dataset
+glimpse(netflix)
+```
+
+
+
+## Preparing the Text
+
+Before analyzing the descriptions, I first clean the text and calculate the number of words in each description which allows me to compare how Netflix describes movies and television shows.
+
+```{r}
+netflix_clean <- netflix |>
+  filter(!is.na(description)) |>
+  mutate(
+    description_clean = str_to_lower(description),
+    word_count = str_count(description_clean, "\\b[a-z]+\\b")
+  )
+
+netflix_clean |>
+  select(title, type, word_count) |>
+  head(10)
+```
+
+
+
+## Visualization 1: Description Lengths of Movies and TV Shows
+
+This visualization compares the number of words used in Netflix descriptions for movies and television shows.
+
+```{r}
+ggplot(netflix_clean, aes(x = type, y = word_count, fill = type)) +
+  geom_boxplot(alpha = 0.8) +
+  labs(
+    title = "Netflix Description Lengths by Content Type",
+    subtitle = "Comparing word counts for movies and TV shows",
+    x = "Content Type",
+    y = "Number of Words",
+    fill = "Content Type"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "none"
+  )
+```
+
+### Interpretation
+
+The boxplot compares the number of words that is used in Netflix descriptions for movies and TV shows. Based on the visualization, both types of content have very similar description legnth, with the median being around 24 to 25 words. However, it seems that the movie description have more outliers with higher word counts compared to TV shows. This shows that Neflix generally uses a similar amount of text to describe both movies and television shows.
+ 
+
+
+## Visualization 2: Common Themes in Netflix Descriptions
+
+To understand how Netflix describes its content, I examine three common storytelling themes: love and relationships, crime and mystery, and family and friendship. I use regular expressions to identify descriptions that contain words associated with each theme.
+
+```{r}
+netflix_themes <- netflix_clean |>
+  mutate(
+    love = str_detect(
+      description_clean,
+      "\\b(love|romance|marriage|dating)\\b"
+    ),
+    crime = str_detect(
+      description_clean,
+      "\\b(crime|murder|detective|mystery)\\b"
+    ),
+    family = str_detect(
+      description_clean,
+      "\\b(family|friendship|friends|parents)\\b"
+    )
+  )
+
+theme_summary <- netflix_themes |>
+  group_by(type) |>
+  summarize(
+    `Love and Relationships` = mean(love) * 100,
+    `Crime and Mystery` = mean(crime) * 100,
+    `Family and Friendship` = mean(family) * 100,
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = -type,
+    names_to = "theme",
+    values_to = "percentage"
+  )
+
+ggplot(
+  theme_summary,
+  aes(x = theme, y = percentage, fill = type)
+) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Common Themes in Netflix Descriptions",
+    subtitle = "Percentage of descriptions mentioning each theme",
+    x = "Storytelling Theme",
+    y = "Descriptions Mentioning Theme (%)",
+    fill = "Content Type"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 20, hjust = 1)
+  )
+```
+
+### Interpretation
+
+The bar chart compares how frequently three storytelling themes appear in Netflix movie and TV show descriptions. Family and friendship is the most common theme among the three categories, appearing in approximately 15% of TV show descriptions and 12.5% of movie descriptions. Crime and mystery appears less frequently than the other themes, especially in movies. Overall, TV show descriptions mention all three themes more often than movie descriptions. However, these results only reflect the specific keywords used in this analysis and do not necessarily represent every theme in the actual content.
+
+
+
+
+## Visualization 3: Young Characters in Netflix Descriptions
+
+This analysis examines how often Netflix descriptions use the word "young" before words such as woman, man, girl, and boy.
+
+```{r}
+young_characters <- netflix_clean |>
+  mutate(
+    character_type = case_when(
+      str_detect(description_clean, "\\byoung\\s+(?=woman\\b)") ~ "Young Woman",
+      str_detect(description_clean, "\\byoung\\s+(?=man\\b)") ~ "Young Man",
+      str_detect(description_clean, "\\byoung\\s+(?=girl\\b)") ~ "Young Girl",
+      str_detect(description_clean, "\\byoung\\s+(?=boy\\b)") ~ "Young Boy",
+      TRUE ~ "Other"
+    )
+  ) |>
+  filter(character_type != "Other") |>
+  count(character_type) |>
+  mutate(character_type = fct_reorder(character_type, n))
+
+ggplot(young_characters, aes(x = character_type, y = n, fill = character_type)) +
+  geom_col(show.legend = FALSE) +
+  labs(
+    title = "Young Characters in Netflix Descriptions",
+    x = "Character Description",
+    y = "Number of Netflix Titles"
+  ) +
+  theme_minimal()
+```
+
+
+
+### Interpretation
+
+The bar chart shows how frequently Netflix descriptions use the word "young" before different character descriptions. "Young man" appears most frequently, followed closely by "young woman." In comparison, "young boy" and "young girl" appear much less frequently. This suggests that Netflix descriptions are more likely to introduce young adult characters using these specific phrases than younger characters. However, these results only reflect the phrases included in the analysis and do not represent all characters appearing in Netflix content.
+
+## Conclusion
+
+Through this project, I explored how Netflix uses language to describe movies and television shows. The first visualization showed that movie and TV show descriptions generally have similar word counts, suggesting that Netflix uses a consistent description length across both types of content.
+
+The second visualization showed that family and friendship was the most frequently mentioned of the three themes examined, while crime and mystery appeared less frequently. TV show descriptions also mentioned all three themes more often than movie descriptions.
+
+Finally, the third visualization showed that phrases such as "young man" and "young woman" appeared more frequently than "young boy" and "young girl." This suggests that certain character descriptions are more common than others.
+
+Overall, this analysis demonstrates how string functions and regular expressions can reveal patterns in text data. Although the results are limited to the keywords and phrases selected, they provide insight into how Netflix descriptions introduce stories, themes, and characters.
+
+
+
+## Data Sources and References
+
+**TidyTuesday Dataset**
+
+R for Data Science. (2021, April 20). *Netflix titles*. TidyTuesday GitHub repository.
+
+https://github.com/rfordatascience/tidytuesday/tree/main/data/2021/2021-04-20
+
+**Original Data Source**
+
+Flixable. (n.d.). *Netflix catalog data*. https://flixable.com/
+
+The Netflix Titles dataset was made available through the TidyTuesday project and was originally collected from Flixable, a third-party Netflix search engine. The dataset represents a historical snapshot of Netflix titles rather than Netflix's current catalog.

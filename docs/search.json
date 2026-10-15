@@ -1,31 +1,80 @@
 [
   {
-    "objectID": "analysis2.html",
-    "href": "analysis2.html",
-    "title": "Palmer Penguins",
+    "objectID": "netflix-text-analysis.html",
+    "href": "netflix-text-analysis.html",
+    "title": "Beyond the Screen: A Text Analysis of Netflix Descriptions",
     "section": "",
-    "text": "This project explores data about penguins. I will compare the flipper lengths of different penguin species using a visualization.\n\n\n\npenguins &lt;- readr::read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2020/2020-07-28/penguins.csv\"\n)\n\n\n\n\nThis boxplot compares the flipper lengths of Adelie, Chinstrap, and Gentoo penguins.\n\nggplot2::ggplot(\n  penguins,\n  ggplot2::aes(x = species, y = flipper_length_mm)\n) +\n  ggplot2::geom_boxplot() +\n  ggplot2::labs(\n    title = \"Flipper Length by Penguin Species\",\n    x = \"Penguin Species\",\n    y = \"Flipper Length (mm)\"\n  )\n\n\n\n\n\n\n\n\n\n\n\n\nTidyTuesday dataset and README\nOriginal Palmer Penguins project"
+    "text": "Netflix offers a variety of movies and tv shows, each describes using a short summary intented to introduce viewers to the content. These description provide an opportunity to examine how language is used to communiate different genres.\nIn this project, I will analyze the text of Neflix descriptions to explore three questions:\n\nWhat words and themes appear more frequently in netflix descriptions?\nHow do descriptions differ movies and tv shows?\nWhat kinds of storytelling themes appear most often?\n\nUsing string function, expressions, and data visualizations in R, I will investigate the patterns in how Netflix content is described.\n\n\nFor this project, I use the Netflix Titles dataset from the TidyTuesday collection for April 20, 2021. The dataset contains information about 7,787 movies and TV shows, including their titles, release years, genres, and descriptions. I focus on the descriptions to identify patterns in the language used to introduce different types of content.\n\n\nShow R Code\n# Load packages\nlibrary(tidyverse)\n\n# Load Netflix dataset\nnetflix &lt;- read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-04-20/netflix_titles.csv\"\n)\n\n# Examine the dataset\nglimpse(netflix)\n\n\nRows: 7,787\nColumns: 12\n$ show_id      &lt;chr&gt; \"s1\", \"s2\", \"s3\", \"s4\", \"s5\", \"s6\", \"s7\", \"s8\", \"s9\", \"s1…\n$ type         &lt;chr&gt; \"TV Show\", \"Movie\", \"Movie\", \"Movie\", \"Movie\", \"TV Show\",…\n$ title        &lt;chr&gt; \"3%\", \"7:19\", \"23:59\", \"9\", \"21\", \"46\", \"122\", \"187\", \"70…\n$ director     &lt;chr&gt; NA, \"Jorge Michel Grau\", \"Gilbert Chan\", \"Shane Acker\", \"…\n$ cast         &lt;chr&gt; \"João Miguel, Bianca Comparato, Michel Gomes, Rodolfo Val…\n$ country      &lt;chr&gt; \"Brazil\", \"Mexico\", \"Singapore\", \"United States\", \"United…\n$ date_added   &lt;chr&gt; \"August 14, 2020\", \"December 23, 2016\", \"December 20, 201…\n$ release_year &lt;dbl&gt; 2020, 2016, 2011, 2009, 2008, 2016, 2019, 1997, 2019, 200…\n$ rating       &lt;chr&gt; \"TV-MA\", \"TV-MA\", \"R\", \"PG-13\", \"PG-13\", \"TV-MA\", \"TV-MA\"…\n$ duration     &lt;chr&gt; \"4 Seasons\", \"93 min\", \"78 min\", \"80 min\", \"123 min\", \"1 …\n$ listed_in    &lt;chr&gt; \"International TV Shows, TV Dramas, TV Sci-Fi & Fantasy\",…\n$ description  &lt;chr&gt; \"In a future where the elite inhabit an island paradise f…\n\n\n\n\n\nBefore analyzing the descriptions, I first clean the text and calculate the number of words in each description which allows me to compare how Netflix describes movies and television shows.\n\n\nShow R Code\nnetflix_clean &lt;- netflix |&gt;\n  filter(!is.na(description)) |&gt;\n  mutate(\n    description_clean = str_to_lower(description),\n    word_count = str_count(description_clean, \"\\\\b[a-z]+\\\\b\")\n  )\n\nnetflix_clean |&gt;\n  select(title, type, word_count) |&gt;\n  head(10)\n\n\n# A tibble: 10 × 3\n   title type    word_count\n   &lt;chr&gt; &lt;chr&gt;        &lt;int&gt;\n 1 3%    TV Show         25\n 2 7:19  Movie           24\n 3 23:59 Movie           25\n 4 9     Movie           24\n 5 21    Movie           23\n 6 46    TV Show         23\n 7 122   Movie           24\n 8 187   Movie           41\n 9 706   Movie           26\n10 1920  Movie           26\n\n\n\n\n\nThis visualization compares the number of words used in Netflix descriptions for movies and television shows.\n\n\nShow R Code\nggplot(netflix_clean, aes(x = type, y = word_count, fill = type)) +\n  geom_boxplot(alpha = 0.8) +\n  labs(\n    title = \"Netflix Description Lengths by Content Type\",\n    subtitle = \"Comparing word counts for movies and TV shows\",\n    x = \"Content Type\",\n    y = \"Number of Words\",\n    fill = \"Content Type\"\n  ) +\n  theme_minimal() +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    legend.position = \"none\"\n  )\n\n\n\n\n\n\n\n\n\n\n\nThe boxplot compares the number of words that is used in Netflix descriptions for movies and TV shows. Based on the visualization, both types of content have very similar description legnth, with the median being around 24 to 25 words. However, it seems that the movie description have more outliers with higher word counts compared to TV shows. This shows that Neflix generally uses a similar amount of text to describe both movies and television shows.\n\n\n\n\nTo understand how Netflix describes its content, I examine three common storytelling themes: love and relationships, crime and mystery, and family and friendship. I use regular expressions to identify descriptions that contain words associated with each theme.\n\n\nShow R Code\nnetflix_themes &lt;- netflix_clean |&gt;\n  mutate(\n    love = str_detect(\n      description_clean,\n      \"\\\\b(love|romance|marriage|dating)\\\\b\"\n    ),\n    crime = str_detect(\n      description_clean,\n      \"\\\\b(crime|murder|detective|mystery)\\\\b\"\n    ),\n    family = str_detect(\n      description_clean,\n      \"\\\\b(family|friendship|friends|parents)\\\\b\"\n    )\n  )\n\ntheme_summary &lt;- netflix_themes |&gt;\n  group_by(type) |&gt;\n  summarize(\n    `Love and Relationships` = mean(love) * 100,\n    `Crime and Mystery` = mean(crime) * 100,\n    `Family and Friendship` = mean(family) * 100,\n    .groups = \"drop\"\n  ) |&gt;\n  pivot_longer(\n    cols = -type,\n    names_to = \"theme\",\n    values_to = \"percentage\"\n  )\n\nggplot(\n  theme_summary,\n  aes(x = theme, y = percentage, fill = type)\n) +\n  geom_col(position = \"dodge\") +\n  labs(\n    title = \"Common Themes in Netflix Descriptions\",\n    subtitle = \"Percentage of descriptions mentioning each theme\",\n    x = \"Storytelling Theme\",\n    y = \"Descriptions Mentioning Theme (%)\",\n    fill = \"Content Type\"\n  ) +\n  theme_minimal() +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    axis.text.x = element_text(angle = 20, hjust = 1)\n  )\n\n\n\n\n\n\n\n\n\n\n\nThe bar chart compares how frequently three storytelling themes appear in Netflix movie and TV show descriptions. Family and friendship is the most common theme among the three categories, appearing in approximately 15% of TV show descriptions and 12.5% of movie descriptions. Crime and mystery appears less frequently than the other themes, especially in movies. Overall, TV show descriptions mention all three themes more often than movie descriptions. However, these results only reflect the specific keywords used in this analysis and do not necessarily represent every theme in the actual content.\n\n\n\n\nThis analysis examines how often Netflix descriptions use the word “young” before words such as woman, man, girl, and boy.\n\n\nShow R Code\nyoung_characters &lt;- netflix_clean |&gt;\n  mutate(\n    character_type = case_when(\n      str_detect(description_clean, \"\\\\byoung\\\\s+(?=woman\\\\b)\") ~ \"Young Woman\",\n      str_detect(description_clean, \"\\\\byoung\\\\s+(?=man\\\\b)\") ~ \"Young Man\",\n      str_detect(description_clean, \"\\\\byoung\\\\s+(?=girl\\\\b)\") ~ \"Young Girl\",\n      str_detect(description_clean, \"\\\\byoung\\\\s+(?=boy\\\\b)\") ~ \"Young Boy\",\n      TRUE ~ \"Other\"\n    )\n  ) |&gt;\n  filter(character_type != \"Other\") |&gt;\n  count(character_type) |&gt;\n  mutate(character_type = fct_reorder(character_type, n))\n\nggplot(young_characters, aes(x = character_type, y = n, fill = character_type)) +\n  geom_col(show.legend = FALSE) +\n  labs(\n    title = \"Young Characters in Netflix Descriptions\",\n    x = \"Character Description\",\n    y = \"Number of Netflix Titles\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\n\n\nThe bar chart shows how frequently Netflix descriptions use the word “young” before different character descriptions. “Young man” appears most frequently, followed closely by “young woman.” In comparison, “young boy” and “young girl” appear much less frequently. This suggests that Netflix descriptions are more likely to introduce young adult characters using these specific phrases than younger characters. However, these results only reflect the phrases included in the analysis and do not represent all characters appearing in Netflix content.\n\n\n\n\nThrough this project, I explored how Netflix uses language to describe movies and television shows. The first visualization showed that movie and TV show descriptions generally have similar word counts, suggesting that Netflix uses a consistent description length across both types of content.\nThe second visualization showed that family and friendship was the most frequently mentioned of the three themes examined, while crime and mystery appeared less frequently. TV show descriptions also mentioned all three themes more often than movie descriptions.\nFinally, the third visualization showed that phrases such as “young man” and “young woman” appeared more frequently than “young boy” and “young girl.” This suggests that certain character descriptions are more common than others.\nOverall, this analysis demonstrates how string functions and regular expressions can reveal patterns in text data. Although the results are limited to the keywords and phrases selected, they provide insight into how Netflix descriptions introduce stories, themes, and characters.\n\n\n\nTidyTuesday Dataset\nR for Data Science. (2021, April 20). Netflix titles. TidyTuesday GitHub repository.\nhttps://github.com/rfordatascience/tidytuesday/tree/main/data/2021/2021-04-20\nOriginal Data Source\nFlixable. (n.d.). Netflix catalog data. https://flixable.com/\nThe Netflix Titles dataset was made available through the TidyTuesday project and was originally collected from Flixable, a third-party Netflix search engine. The dataset represents a historical snapshot of Netflix titles rather than Netflix’s current catalog."
   },
   {
-    "objectID": "analysis2.html#load-the-data",
-    "href": "analysis2.html#load-the-data",
-    "title": "Palmer Penguins",
+    "objectID": "netflix-text-analysis.html#data",
+    "href": "netflix-text-analysis.html#data",
+    "title": "Beyond the Screen: A Text Analysis of Netflix Descriptions",
     "section": "",
-    "text": "penguins &lt;- readr::read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2020/2020-07-28/penguins.csv\"\n)"
+    "text": "For this project, I use the Netflix Titles dataset from the TidyTuesday collection for April 20, 2021. The dataset contains information about 7,787 movies and TV shows, including their titles, release years, genres, and descriptions. I focus on the descriptions to identify patterns in the language used to introduce different types of content.\n\n\nShow R Code\n# Load packages\nlibrary(tidyverse)\n\n# Load Netflix dataset\nnetflix &lt;- read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-04-20/netflix_titles.csv\"\n)\n\n# Examine the dataset\nglimpse(netflix)\n\n\nRows: 7,787\nColumns: 12\n$ show_id      &lt;chr&gt; \"s1\", \"s2\", \"s3\", \"s4\", \"s5\", \"s6\", \"s7\", \"s8\", \"s9\", \"s1…\n$ type         &lt;chr&gt; \"TV Show\", \"Movie\", \"Movie\", \"Movie\", \"Movie\", \"TV Show\",…\n$ title        &lt;chr&gt; \"3%\", \"7:19\", \"23:59\", \"9\", \"21\", \"46\", \"122\", \"187\", \"70…\n$ director     &lt;chr&gt; NA, \"Jorge Michel Grau\", \"Gilbert Chan\", \"Shane Acker\", \"…\n$ cast         &lt;chr&gt; \"João Miguel, Bianca Comparato, Michel Gomes, Rodolfo Val…\n$ country      &lt;chr&gt; \"Brazil\", \"Mexico\", \"Singapore\", \"United States\", \"United…\n$ date_added   &lt;chr&gt; \"August 14, 2020\", \"December 23, 2016\", \"December 20, 201…\n$ release_year &lt;dbl&gt; 2020, 2016, 2011, 2009, 2008, 2016, 2019, 1997, 2019, 200…\n$ rating       &lt;chr&gt; \"TV-MA\", \"TV-MA\", \"R\", \"PG-13\", \"PG-13\", \"TV-MA\", \"TV-MA\"…\n$ duration     &lt;chr&gt; \"4 Seasons\", \"93 min\", \"78 min\", \"80 min\", \"123 min\", \"1 …\n$ listed_in    &lt;chr&gt; \"International TV Shows, TV Dramas, TV Sci-Fi & Fantasy\",…\n$ description  &lt;chr&gt; \"In a future where the elite inhabit an island paradise f…"
   },
   {
-    "objectID": "analysis2.html#visualize-the-data",
-    "href": "analysis2.html#visualize-the-data",
-    "title": "Palmer Penguins",
+    "objectID": "netflix-text-analysis.html#preparing-the-text",
+    "href": "netflix-text-analysis.html#preparing-the-text",
+    "title": "Beyond the Screen: A Text Analysis of Netflix Descriptions",
     "section": "",
-    "text": "This boxplot compares the flipper lengths of Adelie, Chinstrap, and Gentoo penguins.\n\nggplot2::ggplot(\n  penguins,\n  ggplot2::aes(x = species, y = flipper_length_mm)\n) +\n  ggplot2::geom_boxplot() +\n  ggplot2::labs(\n    title = \"Flipper Length by Penguin Species\",\n    x = \"Penguin Species\",\n    y = \"Flipper Length (mm)\"\n  )"
+    "text": "Before analyzing the descriptions, I first clean the text and calculate the number of words in each description which allows me to compare how Netflix describes movies and television shows.\n\n\nShow R Code\nnetflix_clean &lt;- netflix |&gt;\n  filter(!is.na(description)) |&gt;\n  mutate(\n    description_clean = str_to_lower(description),\n    word_count = str_count(description_clean, \"\\\\b[a-z]+\\\\b\")\n  )\n\nnetflix_clean |&gt;\n  select(title, type, word_count) |&gt;\n  head(10)\n\n\n# A tibble: 10 × 3\n   title type    word_count\n   &lt;chr&gt; &lt;chr&gt;        &lt;int&gt;\n 1 3%    TV Show         25\n 2 7:19  Movie           24\n 3 23:59 Movie           25\n 4 9     Movie           24\n 5 21    Movie           23\n 6 46    TV Show         23\n 7 122   Movie           24\n 8 187   Movie           41\n 9 706   Movie           26\n10 1920  Movie           26"
   },
   {
-    "objectID": "analysis2.html#sources",
-    "href": "analysis2.html#sources",
-    "title": "Palmer Penguins",
+    "objectID": "netflix-text-analysis.html#visualization-1-description-lengths-of-movies-and-tv-shows",
+    "href": "netflix-text-analysis.html#visualization-1-description-lengths-of-movies-and-tv-shows",
+    "title": "Beyond the Screen: A Text Analysis of Netflix Descriptions",
     "section": "",
-    "text": "TidyTuesday dataset and README\nOriginal Palmer Penguins project"
+    "text": "This visualization compares the number of words used in Netflix descriptions for movies and television shows.\n\n\nShow R Code\nggplot(netflix_clean, aes(x = type, y = word_count, fill = type)) +\n  geom_boxplot(alpha = 0.8) +\n  labs(\n    title = \"Netflix Description Lengths by Content Type\",\n    subtitle = \"Comparing word counts for movies and TV shows\",\n    x = \"Content Type\",\n    y = \"Number of Words\",\n    fill = \"Content Type\"\n  ) +\n  theme_minimal() +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    legend.position = \"none\"\n  )\n\n\n\n\n\n\n\n\n\n\n\nThe boxplot compares the number of words that is used in Netflix descriptions for movies and TV shows. Based on the visualization, both types of content have very similar description legnth, with the median being around 24 to 25 words. However, it seems that the movie description have more outliers with higher word counts compared to TV shows. This shows that Neflix generally uses a similar amount of text to describe both movies and television shows."
+  },
+  {
+    "objectID": "netflix-text-analysis.html#visualization-2-common-themes-in-netflix-descriptions",
+    "href": "netflix-text-analysis.html#visualization-2-common-themes-in-netflix-descriptions",
+    "title": "Beyond the Screen: A Text Analysis of Netflix Descriptions",
+    "section": "",
+    "text": "To understand how Netflix describes its content, I examine three common storytelling themes: love and relationships, crime and mystery, and family and friendship. I use regular expressions to identify descriptions that contain words associated with each theme.\n\n\nShow R Code\nnetflix_themes &lt;- netflix_clean |&gt;\n  mutate(\n    love = str_detect(\n      description_clean,\n      \"\\\\b(love|romance|marriage|dating)\\\\b\"\n    ),\n    crime = str_detect(\n      description_clean,\n      \"\\\\b(crime|murder|detective|mystery)\\\\b\"\n    ),\n    family = str_detect(\n      description_clean,\n      \"\\\\b(family|friendship|friends|parents)\\\\b\"\n    )\n  )\n\ntheme_summary &lt;- netflix_themes |&gt;\n  group_by(type) |&gt;\n  summarize(\n    `Love and Relationships` = mean(love) * 100,\n    `Crime and Mystery` = mean(crime) * 100,\n    `Family and Friendship` = mean(family) * 100,\n    .groups = \"drop\"\n  ) |&gt;\n  pivot_longer(\n    cols = -type,\n    names_to = \"theme\",\n    values_to = \"percentage\"\n  )\n\nggplot(\n  theme_summary,\n  aes(x = theme, y = percentage, fill = type)\n) +\n  geom_col(position = \"dodge\") +\n  labs(\n    title = \"Common Themes in Netflix Descriptions\",\n    subtitle = \"Percentage of descriptions mentioning each theme\",\n    x = \"Storytelling Theme\",\n    y = \"Descriptions Mentioning Theme (%)\",\n    fill = \"Content Type\"\n  ) +\n  theme_minimal() +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    axis.text.x = element_text(angle = 20, hjust = 1)\n  )\n\n\n\n\n\n\n\n\n\n\n\nThe bar chart compares how frequently three storytelling themes appear in Netflix movie and TV show descriptions. Family and friendship is the most common theme among the three categories, appearing in approximately 15% of TV show descriptions and 12.5% of movie descriptions. Crime and mystery appears less frequently than the other themes, especially in movies. Overall, TV show descriptions mention all three themes more often than movie descriptions. However, these results only reflect the specific keywords used in this analysis and do not necessarily represent every theme in the actual content."
+  },
+  {
+    "objectID": "netflix-text-analysis.html#visualization-3-young-characters-in-netflix-descriptions",
+    "href": "netflix-text-analysis.html#visualization-3-young-characters-in-netflix-descriptions",
+    "title": "Beyond the Screen: A Text Analysis of Netflix Descriptions",
+    "section": "",
+    "text": "This analysis examines how often Netflix descriptions use the word “young” before words such as woman, man, girl, and boy.\n\n\nShow R Code\nyoung_characters &lt;- netflix_clean |&gt;\n  mutate(\n    character_type = case_when(\n      str_detect(description_clean, \"\\\\byoung\\\\s+(?=woman\\\\b)\") ~ \"Young Woman\",\n      str_detect(description_clean, \"\\\\byoung\\\\s+(?=man\\\\b)\") ~ \"Young Man\",\n      str_detect(description_clean, \"\\\\byoung\\\\s+(?=girl\\\\b)\") ~ \"Young Girl\",\n      str_detect(description_clean, \"\\\\byoung\\\\s+(?=boy\\\\b)\") ~ \"Young Boy\",\n      TRUE ~ \"Other\"\n    )\n  ) |&gt;\n  filter(character_type != \"Other\") |&gt;\n  count(character_type) |&gt;\n  mutate(character_type = fct_reorder(character_type, n))\n\nggplot(young_characters, aes(x = character_type, y = n, fill = character_type)) +\n  geom_col(show.legend = FALSE) +\n  labs(\n    title = \"Young Characters in Netflix Descriptions\",\n    x = \"Character Description\",\n    y = \"Number of Netflix Titles\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\n\n\nThe bar chart shows how frequently Netflix descriptions use the word “young” before different character descriptions. “Young man” appears most frequently, followed closely by “young woman.” In comparison, “young boy” and “young girl” appear much less frequently. This suggests that Netflix descriptions are more likely to introduce young adult characters using these specific phrases than younger characters. However, these results only reflect the phrases included in the analysis and do not represent all characters appearing in Netflix content."
+  },
+  {
+    "objectID": "netflix-text-analysis.html#conclusion",
+    "href": "netflix-text-analysis.html#conclusion",
+    "title": "Beyond the Screen: A Text Analysis of Netflix Descriptions",
+    "section": "",
+    "text": "Through this project, I explored how Netflix uses language to describe movies and television shows. The first visualization showed that movie and TV show descriptions generally have similar word counts, suggesting that Netflix uses a consistent description length across both types of content.\nThe second visualization showed that family and friendship was the most frequently mentioned of the three themes examined, while crime and mystery appeared less frequently. TV show descriptions also mentioned all three themes more often than movie descriptions.\nFinally, the third visualization showed that phrases such as “young man” and “young woman” appeared more frequently than “young boy” and “young girl.” This suggests that certain character descriptions are more common than others.\nOverall, this analysis demonstrates how string functions and regular expressions can reveal patterns in text data. Although the results are limited to the keywords and phrases selected, they provide insight into how Netflix descriptions introduce stories, themes, and characters."
+  },
+  {
+    "objectID": "netflix-text-analysis.html#data-sources-and-references",
+    "href": "netflix-text-analysis.html#data-sources-and-references",
+    "title": "Beyond the Screen: A Text Analysis of Netflix Descriptions",
+    "section": "",
+    "text": "TidyTuesday Dataset\nR for Data Science. (2021, April 20). Netflix titles. TidyTuesday GitHub repository.\nhttps://github.com/rfordatascience/tidytuesday/tree/main/data/2021/2021-04-20\nOriginal Data Source\nFlixable. (n.d.). Netflix catalog data. https://flixable.com/\nThe Netflix Titles dataset was made available through the TidyTuesday project and was originally collected from Flixable, a third-party Netflix search engine. The dataset represents a historical snapshot of Netflix titles rather than Netflix’s current catalog."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "about",
+    "section": "",
+    "text": "Hi, my name is Tyler Rhee. I am a student learning data science and R programming.\nThis website showcases some of my data visualization projects using data from TidyTuesday.\n\n\nExplore the Data Viz menu to see my two data analysis projects.\n\n\n\nYou can find the code for this website in my GitHub repository.\n\n\n\nPalm trees"
+  },
+  {
+    "objectID": "about.html#my-projects",
+    "href": "about.html#my-projects",
+    "title": "about",
+    "section": "",
+    "text": "Explore the Data Viz menu to see my two data analysis projects."
+  },
+  {
+    "objectID": "about.html#my-code",
+    "href": "about.html#my-code",
+    "title": "about",
+    "section": "",
+    "text": "You can find the code for this website in my GitHub repository.\n\n\n\nPalm trees"
   },
   {
     "objectID": "analysis1.html#load-the-data",
@@ -56,24 +105,31 @@
     "text": "Sources\n\nTidyTuesday Palm Trees dataset and README\nTidyTuesday project"
   },
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "about",
+    "objectID": "analysis2.html",
+    "href": "analysis2.html",
+    "title": "Palmer Penguins",
     "section": "",
-    "text": "Hi, my name is Tyler Rhee. I am a student learning data science and R programming.\nThis website showcases some of my data visualization projects using data from TidyTuesday.\n\n\nExplore the Data Viz menu to see my two data analysis projects.\n\n\n\nYou can find the code for this website in my GitHub repository.\n\n\n\nPalm trees"
+    "text": "This project explores data about penguins. I will compare the flipper lengths of different penguin species using a visualization.\n\n\n\npenguins &lt;- readr::read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2020/2020-07-28/penguins.csv\"\n)\n\n\n\n\nThis boxplot compares the flipper lengths of Adelie, Chinstrap, and Gentoo penguins.\n\nggplot2::ggplot(\n  penguins,\n  ggplot2::aes(x = species, y = flipper_length_mm)\n) +\n  ggplot2::geom_boxplot() +\n  ggplot2::labs(\n    title = \"Flipper Length by Penguin Species\",\n    x = \"Penguin Species\",\n    y = \"Flipper Length (mm)\"\n  )\n\n\n\n\n\n\n\n\n\n\n\n\nTidyTuesday dataset and README\nOriginal Palmer Penguins project"
   },
   {
-    "objectID": "about.html#my-projects",
-    "href": "about.html#my-projects",
-    "title": "about",
+    "objectID": "analysis2.html#load-the-data",
+    "href": "analysis2.html#load-the-data",
+    "title": "Palmer Penguins",
     "section": "",
-    "text": "Explore the Data Viz menu to see my two data analysis projects."
+    "text": "penguins &lt;- readr::read_csv(\n  \"https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2020/2020-07-28/penguins.csv\"\n)"
   },
   {
-    "objectID": "about.html#my-code",
-    "href": "about.html#my-code",
-    "title": "about",
+    "objectID": "analysis2.html#visualize-the-data",
+    "href": "analysis2.html#visualize-the-data",
+    "title": "Palmer Penguins",
     "section": "",
-    "text": "You can find the code for this website in my GitHub repository.\n\n\n\nPalm trees"
+    "text": "This boxplot compares the flipper lengths of Adelie, Chinstrap, and Gentoo penguins.\n\nggplot2::ggplot(\n  penguins,\n  ggplot2::aes(x = species, y = flipper_length_mm)\n) +\n  ggplot2::geom_boxplot() +\n  ggplot2::labs(\n    title = \"Flipper Length by Penguin Species\",\n    x = \"Penguin Species\",\n    y = \"Flipper Length (mm)\"\n  )"
+  },
+  {
+    "objectID": "analysis2.html#sources",
+    "href": "analysis2.html#sources",
+    "title": "Palmer Penguins",
+    "section": "",
+    "text": "TidyTuesday dataset and README\nOriginal Palmer Penguins project"
   }
 ]
