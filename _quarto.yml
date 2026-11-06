@@ -17,6 +17,9 @@ website:
             href: analysis2.qmd
           - text: "Netflix Text Analysis"
             href: netflix-text-analysis.qmd
+          - text: "Birthday Paradox"
+            href: birthday-paradox.qmd
+
 
 format:
   html:

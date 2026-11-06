@@ -1,0 +1,99 @@
+
+---
+title: "The Birthday Paradox: A Simulation Study"
+author: "Tyler Rhee"
+format:
+  html:
+    code-fold: true
+    toc: true
+execute:
+  warning: false
+  message: false
+---
+
+## Introduction
+
+Have you ever wondered how likely it is that two people in the same classroom share a birthday? Even though there are 365 possible birthdays, the chance of a match can be surprisingly high. In this project, I will use a simulation in R to estimate the probability that at least two people in a group share the same birthday. I will compare different group sizes to see how the probability changes, assuming that birthdays are equally likely on all 365 days of the year.
+
+
+```{r}
+library(tidyverse)
+```
+
+
+## Creating the Simulation
+
+I created a function that randomly assigns birthdays to a group of people. Each birthday is represented by a number from 1 to 365, assuming every day is equally likely. The function checks if at least two people share the same birthday. It returns 1 if there is a match and 0 if there is no match.
+
+
+```{r}
+birthday_sim <- function(n_people) {
+  birthdays <- sample(1:365, size = n_people, replace = TRUE)
+
+  if (any(duplicated(birthdays))) {
+    return(1)
+  } else {
+    return(0)
+  }
+}
+```
+
+
+## Running the Simulation
+
+
+I used `map_int()` because my function returns either 1 or 0, depending on whether a birthday match occurs. This allows me to repeat the simulation 1,000 times and store the results as integers. I then used `mean()` to calculate the proportion of simulations that had a match. I used `map_dbl()` to repeat this process for different group sizes and store the estimated probabilities.
+
+
+```{r}
+set.seed(123)
+
+group_sizes <- seq(5, 60, by = 5)
+
+results <- tibble(
+  group_size = group_sizes,
+  probability = map_dbl(group_sizes, function(n) {
+    simulations <- map_int(1:1000, function(x) {
+      birthday_sim(n)
+    })
+    mean(simulations)
+  })
+)
+
+results
+```
+
+## Results
+
+The table shows the estimated probability of at least two people sharing a birthday for different group sizes. For a group of 5 people, the probability was only 3.3%, but it increased to 57.3% for a group of 25 people. For a group of 60 people, the probability reached 99.1%. These results show that the chance of a shared birthday increases quickly as the group gets larger.
+
+
+## Visualizing the Results
+
+```{r}
+ggplot(results, aes(x = group_size, y = probability)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  geom_point(color = "steelblue", size = 2.5) +
+  labs(
+    title = "Probability of Sharing a Birthday",
+    subtitle = "Based on 1,000 simulations per group size",
+    x = "Number of People in the Group",
+    y = "Estimated Probability of a Match"
+  ) +
+  scale_y_continuous(
+    labels = scales::percent,
+    limits = c(0, 1)
+  ) +
+  theme_minimal()
+```
+
+
+## Discussion
+
+The graph shows that the probability of sharing a birthday increases as the number of people in a group gets larger. For small groups, the probability is relatively low, but it increases quickly as more people are added. For example, my simulation found that a group of 25 people had a 57.3% chance of having at least one shared birthday. This is surprising because there are 365 possible birthdays, but a group of only 25 people already has a greater than 50% chance of a match. One reason is that we are checking whether any two people share a birthday, rather than whether someone shares one specific person's birthday. As the group gets larger, there are more possible pairs of people who could share a birthday.
+
+These results are based on simulated groups in which birthdays are independently and equally likely across 365 days.
+
+## Conclusion
+
+In this project, I used a simulation to study the birthday paradox. I created a function that randomly assigned birthdays and checked whether at least two people shared the same birthday. By repeating the simulation 1,000 times for different group sizes, I found that the probability of a match increases quickly as the group gets larger. These results show that shared birthdays are more common than we might expect, assuming birthdays are equally likely across 365 days.
